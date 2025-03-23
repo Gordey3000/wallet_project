@@ -1,0 +1,24 @@
+services:
+  db:
+    image: postgres:15
+    container_name: postgres_wallet
+    restart: always
+    environment:
+      POSTGRES_DB: wallet_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+
+  django:
+    build: .
+    container_name: django_wallet
+    restart: always
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://user:password@db:5432/wallet_db
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "sleep 5 && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
